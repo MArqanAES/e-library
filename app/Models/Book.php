@@ -12,6 +12,12 @@ class Book extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'published_at' => 'datetime',
+    ];
+
+    protected $with = ['category','author'];
+
     public function category()
     {
         return $this->belongsTo(Category::class);
