@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Book extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $guarded = ['id'];
 
@@ -16,7 +17,28 @@ class Book extends Model
         'published_at' => 'datetime',
     ];
 
-    protected $with = ['category','author'];
+    protected $with = ['author', 'category'];
+
+    #[Scope]
+    protected function search(Builder $query, $filters) {
+        $query->when(
+            $filters['search'] ?? false,
+            fn ($query, $search) => 
+            $query->where('name', 'like', '%' . $search . '%' )
+        );
+
+        $query->when(
+            $filters['category'] ?? false,
+            fn ($query, $category) => 
+            $query->whereHas('category', fn($query) => $query->where('slug', $category))
+        );
+
+        $query->when(
+            $filters['author'] ?? false,
+            fn ($query, $author) => 
+            $query->whereHas('author', fn($query) => $query->where('slug', $author))
+        );
+    }
 
     public function category()
     {

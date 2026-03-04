@@ -4,36 +4,36 @@ namespace App\Http\Controllers;
 
 use App\Models\Author;
 use App\Models\Book;
-use Illuminate\Http\Request;
+use App\Models\Category;
 
 class HallController extends Controller
 {
-public function index()
-{
-    $title = 'Hall';
-    $books = Book::with(['author', 'category'])->get();
-
-    // return dd($books); 
-    return view('hall', compact('title', 'books'));
-    }
-
-public function singleBook(Book $book)
+    public function index()
     {
-        $title = $book->name;
-        return dd($book);
-    }
+        $title = '';
 
-    public function hallAuthor(Author $author)
-    {
-        $title = 'Books by ' . $author->name;
-        $books = Book::where('author_id', $author->id)->get();
+        if (request('category')) {
+            $category = Category::where('slug', request('category'))->first();
+            $title = " of " . $category->name;
+        }
+        if (request('author')) {
+            $author = Author::where('slug', request('author'))->first();
+            $title = " by " . $author->name;
+        }
+
+        $title = 'Hall ' . $title;
+
+        $books = Book::latest()
+                ->search(request(['search', 'category', 'author']))
+                ->paginate(10)
+                ->withQueryString();
+
         return view('hall', compact('title', 'books'));
     }
 
-    public function singleAuthor($slug)
-    {
-        $title = 'Books of ' . $category->name;
-        $books = Book::where('category_id', $category->id)->get();
-        return view('hall', compact('books', 'title'));
+    public function singleBook(Book $book) {
+        $title = $book->name;
+        
+        return view('book', compact('title', 'book'));
     }
-}    
+}

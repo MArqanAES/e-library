@@ -11,7 +11,7 @@ class Author extends Model
 
     protected $guarded = ['id'];
 
-    public function books()
+    public function book()
     {
         return $this->hasMany(Book::class);
     }
