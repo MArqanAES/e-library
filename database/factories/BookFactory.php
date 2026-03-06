@@ -16,17 +16,17 @@ class BookFactory extends Factory
      *
      * @return array<string, mixed>
      */
-   public function definition(): array
-{
-    $name = fake()->words(3, true);
+    public function definition(): array
+    {
+        $name = fake()->words(3, true);
 
-    return [
-        'name' => $name,
-        'slug' => str()->slug($name),
-        'body' => fake()->paragraphs(3, true),
-        'published_at' => fake()->boolean(70) ? fake()->dateTimeBetween('-5 years', 'now') : null,
-        'category_id' => Category::inRandomOrder()->first()->id ?? Category::factory(),
-        'author_id' => Author::inRandomOrder()->first()->id ?? Author::factory()
-    ];
-}
+        return [
+            'name' => $name,
+            'slug' => str()->slug($name),
+            'body' => fake()->paragraphs(3, true),
+            'published_at' => fake()->boolean(70) ? fake()->dateTimeBetween('-5 years', 'now') : null,
+            'category_id' => Category::inRandomOrder()->first()->id,
+            'author_id' => Author::inRandomOrder()->first()->id,
+        ]; 
+    }
 }
