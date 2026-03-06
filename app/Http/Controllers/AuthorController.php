@@ -23,7 +23,9 @@ class AuthorController extends Controller
      */
     public function create()
     {
-        //
+        $title = "Author - Create";
+
+        return view('dashboard.author.create', compact('title'));
     }
 
     /**
@@ -31,7 +33,16 @@ class AuthorController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'name' => 'required|min:3|max:255',
+            'slug' => 'required|unique:authors'
+        ]);
+
+        Author::create($validatedData);
+
+        return redirect('/dashboard/author')->with('success', 'Data penulis berhasil ditambahkan!');
+
+        // return dd($request->all());
     }
 
     /**
@@ -45,24 +56,40 @@ class AuthorController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Author $author)
     {
-        //
+        $title = "Author - edit";
+
+        return view('dashboard.author.edit', compact('title', 'author'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Author $author)
     {
-        //
+        $rules = [
+            'name' => 'required|max:255',
+        ];
+
+        if (request('slug') != $author->slug) {
+            $rules['slug'] = 'unique:authors|required';
+        }
+
+        $validatedData = $request->validate($rules);
+
+        Author::where('slug', $author->slug)->update($validatedData);
+
+        return redirect('/dashboard/author')->with('success', 'Data berhasil diubah!!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Author $author)
     {
-        //
+        Author::destroy($author->id);
+
+        return redirect('/dashboard/author')->with('success', 'Data penulis berhasil dihapus!');
     }
 }
